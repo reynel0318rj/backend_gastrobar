@@ -39,7 +39,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Usuario Prueba\",\n  \"email\": \"usuario@correo.com\",\n  \"password\": \"123456\",\n  \"phone\": \"3001234567\"\n}"
+              "raw": "{\n  \"name\": \"Usuario Prueba\",\n  \"username\": \"usuario_prueba\",\n  \"email\": \"usuario@correo.com\",\n  \"password\": \"123456\",\n  \"phone\": \"3001234567\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/register",
@@ -79,7 +79,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"usuario@correo.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"username\": \"usuario_prueba\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/login",
@@ -116,7 +116,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@correo.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/login",
@@ -152,7 +152,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"staff@correo.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"username\": \"staff\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/login",

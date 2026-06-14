@@ -2,8 +2,28 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const asyncHandler = require('../utils/asyncHandler');
 
+const normalizeUsername = (value) =>
+  value
+    ?.toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, '');
+
+const buildUniqueUsername = async (baseUsername) => {
+  const safeBaseUsername = normalizeUsername(baseUsername) || 'usuario';
+  let candidate = safeBaseUsername;
+  let suffix = 1;
+
+  while (await User.findOne({ username: candidate })) {
+    candidate = `${safeBaseUsername}${suffix}`;
+    suffix += 1;
+  }
+
+  return candidate;
+};
+
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, phone } = req.body;
+  const { name, email, password, phone, username } = req.body;
 
   const userExists = await User.findOne({ email });
 
@@ -12,27 +32,60 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('El usuario ya existe');
   }
 
-  const user = await User.create({ name, email, password, phone, role: 'customer' });
+  const requestedUsername = normalizeUsername(username);
+
+  if (requestedUsername) {
+    const usernameExists = await User.findOne({ username: requestedUsername });
+
+    if (usernameExists) {
+      res.status(400);
+      throw new Error('El nombre de usuario ya existe');
+    }
+  }
+
+  const finalUsername = requestedUsername || (await buildUniqueUsername(email?.split('@')[0]));
+
+  const user = await User.create({
+    name,
+    email,
+    username: finalUsername,
+    password,
+    phone,
+    role: 'customer'
+  });
 
   res.status(201).json({
     _id: user._id,
     name: user.name,
     email: user.email,
+    username: user.username,
     role: user.role,
     token: generateToken(user._id)
   });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, username, usuario, identifier, password } = req.body;
+  const normalizedLogin = normalizeUsername(username || usuario || identifier);
 
-  const user = await User.findOne({ email }).select('+password');
+  const query = [];
+
+  if (email) {
+    query.push({ email: email.trim().toLowerCase() });
+  }
+
+  if (normalizedLogin) {
+    query.push({ username: normalizedLogin });
+  }
+
+  const user = query.length > 0 ? await User.findOne({ $or: query }).select('+password') : null;
 
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      username: user.username,
       role: user.role,
       token: generateToken(user._id)
     });
@@ -86,6 +139,7 @@ const updateUser = asyncHandler(async (req, res) => {
     _id: updatedUser._id,
     name: updatedUser.name,
     email: updatedUser.email,
+    username: updatedUser.username,
     role: updatedUser.role
   });
 });

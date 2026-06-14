@@ -22,3 +22,8 @@ API en Express y MongoDB para controlar usuarios, menus y reservas de un gastrob
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
 - `CLIENT_URL`
+- `CLIENT_URLS`
+
+## Login
+
+El endpoint `POST /api/users/login` acepta `email` o `username` junto con `password`.

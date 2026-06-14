@@ -16,9 +16,17 @@ const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || '')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const isLocalDevelopmentOrigin = (origin) => {
+  if (!origin) {
+    return false;
+  }
+
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+};
+
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || isLocalDevelopmentOrigin(origin)) {
       callback(null, true);
       return;
     }
